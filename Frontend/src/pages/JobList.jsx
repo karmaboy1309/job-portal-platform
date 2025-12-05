@@ -5,34 +5,35 @@ const JobList = () => {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    fetchJobs();
+    loadJobs();
   }, []);
 
-  const fetchJobs = async () => {
+  const loadJobs = async () => {
     try {
       const data = await getJobs();
       setJobs(data);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await deleteJob(id);
-      setJobs(jobs.filter(job => job._id !== id));
+      setJobs(jobs.filter((job) => job._id !== id));
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
 
   return (
     <div className="job-list">
+      <h2>All Jobs</h2>
       {jobs.map((job) => (
-        <div key={job._id} className="job-card">
+        <div className="job-card" key={job._id}>
           <h3>{job.title}</h3>
-          <p>{job.company}</p>
-          <p>{job.salary}</p>
+          <p><b>Company:</b> {job.company}</p>
+          <p><b>Salary:</b> {job.salary}</p>
           <button onClick={() => handleDelete(job._id)}>Delete</button>
         </div>
       ))}
