@@ -15,12 +15,13 @@ app.get('/', (req, res) => {
   res.send('Backend is running...');
 });
 
-// MongoDB Connection (mongoose v9 syntax)
+// Job routes (IMPORTANT: must be above app.listen)
+app.use('/api/jobs', require('./routes/jobRoutes'));
+
+// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-app.use('/api/jobs', require('./routes/jobRoutes'));
