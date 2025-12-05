@@ -1,42 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { getJobs, deleteJob } from "../services/jobService";
+import JobCard from "../components/JobCard";
 
 const JobList = () => {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    loadJobs();
+    fetchJobs();
   }, []);
 
-  const loadJobs = async () => {
-    try {
-      const data = await getJobs();
-      setJobs(data);
-    } catch (error) {
-      console.log(error);
-    }
+  const fetchJobs = async () => {
+    const data = await getJobs();
+    setJobs(data);
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteJob(id);
-      setJobs(jobs.filter((job) => job._id !== id));
-    } catch (error) {
-      console.log(error);
-    }
+    await deleteJob(id);
+    setJobs(jobs.filter((job) => job._id !== id));
   };
 
   return (
-    <div className="job-list">
-      <h2>All Jobs</h2>
-      {jobs.map((job) => (
-        <div className="job-card" key={job._id}>
-          <h3>{job.title}</h3>
-          <p><b>Company:</b> {job.company}</p>
-          <p><b>Salary:</b> {job.salary}</p>
-          <button onClick={() => handleDelete(job._id)}>Delete</button>
-        </div>
-      ))}
+    <div className="job-list-container">
+      <h2>Available Jobs</h2>
+
+      <div className="job-grid">
+        {jobs.map((job) => (
+          <JobCard key={job._id} job={job} onDelete={handleDelete} />
+        ))}
+      </div>
     </div>
   );
 };
