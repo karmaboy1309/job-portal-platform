@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import JobList from "./pages/JobList";
+import "./App.css";
 
 function App() {
   return (
