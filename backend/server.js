@@ -15,13 +15,10 @@ app.get('/', (req, res) => {
   res.send('Backend is running...');
 });
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch((err) => console.log(err));
+// MongoDB Connection (mongoose v9 syntax)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.log(err));
 
 // Start server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
