@@ -13,7 +13,8 @@ export const getJobById = async (id) => {
 };
 
 export const createJob = async (jobData) => {
-  const res = await axios.post(API_URL, jobData);
+  // backend expects POST to /api/jobs/create
+  const res = await axios.post(`${API_URL}/create`, jobData);
   return res.data;
 };
 
