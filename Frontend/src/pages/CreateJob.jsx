@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { createJob } from "../services/jobService";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 
 const CreateJob = () => {
   const navigate = useNavigate();
@@ -9,8 +11,11 @@ const CreateJob = () => {
     title: "",
     company: "",
     salary: "",
+    location: "",
     description: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,14 +26,31 @@ const CreateJob = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    // basic client-side validation for salary and required location
+    const salaryNumber = Number(formData.salary);
+    if (Number.isNaN(salaryNumber)) {
+      setError('Salary must be a number');
+      return;
+    }
+
+    if (!formData.location || formData.location.trim() === '') {
+      setError('Location is required');
+      return;
+    }
+
+    const payload = { ...formData, salary: salaryNumber };
 
     try {
-      await createJob(formData);
-      alert("Job created successfully!");
+      setLoading(true);
+      await createJob(payload);
+      setLoading(false);
       navigate("/"); // back to job list
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong!");
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+      const msg = err?.response?.data?.message || err.message || 'Failed to create job';
+      setError(msg);
     }
   };
 
@@ -37,6 +59,8 @@ const CreateJob = () => {
       <h2>Create New Job</h2>
 
       <form className="job-form" onSubmit={handleSubmit}>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        {loading && <LoadingSpinner />}
         <label>Job Title</label>
         <input
           type="text"
@@ -53,6 +77,16 @@ const CreateJob = () => {
           name="company"
           placeholder="Company Name"
           value={formData.company}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Location</label>
+        <input
+          type="text"
+          name="location"
+          placeholder="City, Remote, etc."
+          value={formData.location}
           onChange={handleChange}
           required
         />
@@ -76,8 +110,8 @@ const CreateJob = () => {
           required
         />
 
-        <button type="submit" className="create-btn">
-          Create Job
+        <button type="submit" className="create-btn" disabled={loading}>
+          {loading ? 'Creating...' : 'Create Job'}
         </button>
       </form>
     </div>
