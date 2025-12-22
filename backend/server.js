@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
 
 // Job routes (IMPORTANT: must be above app.listen)
 app.use('/api/jobs', require('./routes/jobRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
