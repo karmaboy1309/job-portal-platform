@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 
-
-
 const CreateJob = () => {
   const navigate = useNavigate();
 
