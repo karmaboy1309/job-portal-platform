@@ -67,11 +67,13 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Delete Job by ID
-router.delete('/:id', async (req, res) => {
+// Delete Job by ID (owner or admin)
+router.delete('/:id', auth, async (req, res) => {
   try {
-    const job = await Job.findByIdAndDelete(req.params.id);
+    const job = await Job.findById(req.params.id);
     if (!job) return res.status(404).json({ message: 'Job not found' });
+    if (String(job.owner) !== String(req.user._id) && req.user.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
+    await Job.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Job deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });

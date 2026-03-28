@@ -1,18 +1,10 @@
-const ErrorMessage = ({ message }) => {
-  return (
-    <div style={{
-      backgroundColor: "#ffe5e5",
-      color: "#b00020",
-      padding: "12px",
-      borderRadius: "6px",
-      margin: "10px 0",
-      textAlign: "center",
-      fontWeight: "500"
-    }}>
-      {message || "Something went wrong"}
-    </div>
-  );
-};
+import React from 'react';
 
+const ErrorMessage = ({ children, message }) => (
+  <div className="error-box">
+    <span className="error-icon">⚠️</span>
+    <span>{children || message || 'Something went wrong. Please try again.'}</span>
+  </div>
+);
 
 export default ErrorMessage;

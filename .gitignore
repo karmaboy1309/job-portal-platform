@@ -1,0 +1,33 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment keys (CRITICAL - DO NOT UPLOAD)
+.env
+.env.*
+!.env.example
+
+# Build files
+dist/
+build/
+.next/
+
+# Ignoring the entire ss folder containing large media and screenshots
+ss/
+
+# Optional: Ignore personal documents (Uncomment these if you want to keep them off GitHub)
+# *.docx
+# *.pdf
+# *.pptx
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

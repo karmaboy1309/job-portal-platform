@@ -4,6 +4,10 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
   role: { type: String, enum: ['seeker','employer','admin'], default: 'seeker' },
+  location: { type: String },
+  bio: { type: String },
+  skills: { type: [String], default: [] },
+  resumeURL: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 
