@@ -21,6 +21,27 @@ const JobSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  type: {
+    type: String,
+    enum: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'],
+    default: 'Full-time'
+  },
+  // Skills required for the job (e.g. ['React', 'Node.js'])
+  skills: {
+    type: [String],
+    default: []
+  },
+  // Experience level required
+  experience: {
+    type: String,
+    enum: ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Manager'],
+    default: 'Entry Level'
+  },
+  // Application deadline
+  deadline: {
+    type: Date,
+    required: false
+  },
   owner: { type: require('mongoose').Schema.Types.ObjectId, ref: 'User' },
   createdAt: {
     type: Date,
