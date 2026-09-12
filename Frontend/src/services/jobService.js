@@ -31,6 +31,11 @@ export const deleteJob = async (id) => {
   return res.data;
 };
 
+export const updateJob = async (id, jobData) => {
+  const res = await axios.put(`${API_URL}/${id}`, jobData);
+  return res.data;
+};
+
 export const getStats = async () => {
   const res = await axios.get(`${API_URL}/stats`);
   return res.data;
@@ -38,5 +43,15 @@ export const getStats = async () => {
 
 export const applyJob = async (id, payload = {}) => {
   const res = await axios.post(`${API_URL}/${id}/apply`, payload);
+  return res.data;
+};
+
+export const getMyApplications = async () => {
+  const res = await axios.get(`${API_URL}/my-applications`);
+  return res.data;
+};
+
+export const getJobApplications = async (jobId) => {
+  const res = await axios.get(`${API_URL}/${jobId}/applications`);
   return res.data;
 };

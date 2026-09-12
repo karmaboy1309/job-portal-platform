@@ -8,6 +8,10 @@ const UserSchema = new mongoose.Schema({
   bio: { type: String },
   skills: { type: [String], default: [] },
   resumeURL: { type: String },
+  // Profile picture URL
+  avatarURL: { type: String, default: '' },
+  // Soft delete / deactivation flag
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
 
