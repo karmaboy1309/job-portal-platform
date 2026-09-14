@@ -9,13 +9,20 @@ const auth = require('../middleware/auth');
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role, location, bio, skills, resumeURL } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ message: 'Missing fields' });
-    const existing = await User.findOne({ email });
+    if (!name?.trim() || !email?.trim() || !password) return res.status(400).json({ message: 'Name, email, and password are required' });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({ message: 'Please provide a valid email address' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+    const existing = await User.findOne({ email: email.trim().toLowerCase() });
     if (existing) return res.status(400).json({ message: 'Email already registered' });
     const hash = await bcrypt.hash(password, 10);
     const user = new User({
-      name,
-      email,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
       passwordHash: hash,
       role: role || 'seeker',
       location: location || '',
@@ -60,10 +67,31 @@ router.get('/me', auth, async (req, res) => {
 // Update profile
 router.put('/me', auth, async (req, res) => {
   try {
-    const updates = (({ name, location, bio, skills, resumeURL }) => ({ name, location, bio, skills, resumeURL }))(req.body);
+    const updates = (({ name, location, bio, skills, resumeURL, avatarURL }) => ({ name, location, bio, skills, resumeURL, avatarURL }))(req.body);
     if (updates.skills && !Array.isArray(updates.skills)) updates.skills = String(updates.skills).split(',').map(s=>s.trim());
     const user = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true }).select('-passwordHash');
     res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Change password
+router.post('/change-password', auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current password and new password are required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters long' });
+    }
+    const user = await User.findById(req.user._id);
+    const match = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!match) return res.status(400).json({ message: 'Current password is incorrect' });
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: 'Password changed successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
