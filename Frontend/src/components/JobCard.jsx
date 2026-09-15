@@ -55,6 +55,22 @@ const JobCard = ({ job, onDelete }) => {
     ? `$${Number(job.salary).toLocaleString()}`
     : null;
 
+  // Relative time helper
+  const timeAgo = (date) => {
+    if (!date) return null;
+    const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    const days = Math.floor(diff / 86400);
+    if (days === 1) return '1 day ago';
+    if (days < 30) return `${days} days ago`;
+    return new Date(date).toLocaleDateString();
+  };
+
+  const postedAgo = timeAgo(job.createdAt);
+  const skillTags = Array.isArray(job.skills) ? job.skills.slice(0, 3) : [];
+
   return (
     <div className="job-card" onClick={() => navigate(`/jobs/${job._id}`)}>
       {/* Top row */}
@@ -78,9 +94,20 @@ const JobCard = ({ job, onDelete }) => {
             <span className="icon">📍</span> {job.location}
           </span>
         )}
-        <span className="badge badge-blue">Full-time</span>
-        <span className="badge badge-purple">Remote</span>
+        <span className="badge badge-blue">{job.type || 'Full-time'}</span>
+        {job.location && job.location.toLowerCase().includes('remote') && (
+          <span className="badge badge-purple">Remote</span>
+        )}
       </div>
+
+      {/* Skill tags */}
+      {skillTags.length > 0 && (
+        <div className="job-card-skills">
+          {skillTags.map((skill) => (
+            <span key={skill} className="badge badge-purple">{skill}</span>
+          ))}
+        </div>
+      )}
 
       {/* Description */}
       {job.description && (
@@ -89,11 +116,16 @@ const JobCard = ({ job, onDelete }) => {
 
       {/* Footer */}
       <div className="job-card-footer">
-        {formattedSalary ? (
-          <span className="salary-badge">{formattedSalary}/yr</span>
-        ) : (
-          <span className="salary-badge">Competitive</span>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {formattedSalary ? (
+            <span className="salary-badge">{formattedSalary}/yr</span>
+          ) : (
+            <span className="salary-badge">Competitive</span>
+          )}
+          {postedAgo && (
+            <span style={{ fontSize: 11, color: 'var(--clr-text-muted)' }}>🕐 {postedAgo}</span>
+          )}
+        </div>
 
         <div className="job-card-actions" onClick={e => e.stopPropagation()}>
           {user && user.role === 'seeker' && (
