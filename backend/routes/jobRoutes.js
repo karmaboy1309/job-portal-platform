@@ -136,6 +136,30 @@ router.get('/:id/applications', auth, async (req, res) => {
   }
 });
 
+// Employer: update application status (accept / reject)
+router.patch('/:id/applications/:appId', auth, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    if (String(job.owner) !== String(req.user._id) && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    const { status, note } = req.body;
+    if (!['pending', 'accepted', 'rejected'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+    const app = await Application.findByIdAndUpdate(
+      req.params.appId,
+      { status, note: note || '', reviewedAt: new Date() },
+      { new: true }
+    );
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    res.json({ message: 'Application status updated', application: app });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update Job by ID (owner or admin)
 router.put('/:id', auth, async (req, res) => {
   try {
