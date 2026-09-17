@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getStats, getJobs } from '../services/jobService';
+import { getStats, getJobs, getMyApplications } from '../services/jobService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -21,9 +22,16 @@ const Dashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      const [s, j] = await Promise.all([getStats(), getJobs({ limit: 6 })]);
+      const promises = [getStats().catch(() => null), getJobs({ limit: 6 }).catch(() => ({ data: [] }))];
+      if (user?.role === 'seeker') {
+        promises.push(getMyApplications().catch(() => ({ applications: [] })));
+      }
+      const [s, j, myApps] = await Promise.all(promises);
       setStats(s);
-      setJobs(j.data || []);
+      setJobs(j?.data || j || []);
+      if (myApps?.applications) {
+        setApplications(myApps.applications);
+      }
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Failed to load dashboard');
     } finally {
@@ -169,6 +177,44 @@ const Dashboard = () => {
             <button className="btn btn-primary" onClick={() => navigate('/create')}>
               ✨ Post a Job
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Quick actions for seeker */}
+      {user && user.role === 'seeker' && (
+        <div style={{ marginTop: 36, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+          <div
+            style={{ padding: '20px 24px', background: 'var(--clr-surface-2)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--clr-border)', cursor: 'pointer', transition: 'border-color 0.2s' }}
+            onClick={() => navigate('/jobs')}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--clr-primary)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--clr-border)'}
+          >
+            <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>Browse Jobs</div>
+            <div style={{ color: 'var(--clr-text-muted)', fontSize: 12, marginTop: 4 }}>Explore all available listings</div>
+          </div>
+          <div
+            style={{ padding: '20px 24px', background: 'var(--clr-surface-2)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--clr-border)', cursor: 'pointer', transition: 'border-color 0.2s' }}
+            onClick={() => navigate('/my-applications')}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--clr-accent)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--clr-border)'}
+          >
+            <div style={{ fontSize: 28, marginBottom: 8 }}>📋</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>My Applications</div>
+            <div style={{ color: 'var(--clr-text-muted)', fontSize: 12, marginTop: 4 }}>
+              {applications.length > 0 ? `${applications.length} application${applications.length > 1 ? 's' : ''} submitted` : 'Track your applied jobs'}
+            </div>
+          </div>
+          <div
+            style={{ padding: '20px 24px', background: 'var(--clr-surface-2)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--clr-border)', cursor: 'pointer', transition: 'border-color 0.2s' }}
+            onClick={() => navigate('/profile')}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--clr-success)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--clr-border)'}
+          >
+            <div style={{ fontSize: 28, marginBottom: 8 }}>👤</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>My Profile</div>
+            <div style={{ color: 'var(--clr-text-muted)', fontSize: 12, marginTop: 4 }}>Update your resume & skills</div>
           </div>
         </div>
       )}
