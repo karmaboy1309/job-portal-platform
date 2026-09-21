@@ -70,6 +70,7 @@ const JobCard = ({ job, onDelete }) => {
 
   const postedAgo = timeAgo(job.createdAt);
   const skillTags = Array.isArray(job.skills) ? job.skills.slice(0, 3) : [];
+  const expLevel = job.experience || null;
 
   return (
     <div className="job-card" onClick={() => navigate(`/jobs/${job._id}`)}>
@@ -100,12 +101,15 @@ const JobCard = ({ job, onDelete }) => {
         )}
       </div>
 
-      {/* Skill tags */}
-      {skillTags.length > 0 && (
+      {/* Skill tags & experience */}
+      {(skillTags.length > 0 || expLevel) && (
         <div className="job-card-skills">
           {skillTags.map((skill) => (
             <span key={skill} className="badge badge-purple">{skill}</span>
           ))}
+          {expLevel && (
+            <span className="badge badge-green">{expLevel}</span>
+          )}
         </div>
       )}
 

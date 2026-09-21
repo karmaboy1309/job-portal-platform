@@ -86,12 +86,22 @@ const JobDetails = () => {
                 {job.location && (
                   <span className="job-detail-meta">📍 {job.location}</span>
                 )}
-                <span className="job-detail-meta">🏢 Full-time</span>
-                <span className="job-detail-meta">🌍 Open to remote</span>
+                <span className="job-detail-meta">🏢 {job.type || 'Full-time'}</span>
+                {job.createdAt && (
+                  <span className="job-detail-meta">📅 Posted {new Date(job.createdAt).toLocaleDateString()}</span>
+                )}
               </div>
               <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                <span className="badge badge-blue">Full-time</span>
-                <span className="badge badge-purple">Hybrid</span>
+                <span className="badge badge-blue">{job.type || 'Full-time'}</span>
+                {job.location && job.location.toLowerCase().includes('remote') && (
+                  <span className="badge badge-purple">Remote</span>
+                )}
+                {job.experience && (
+                  <span className="badge badge-green">{job.experience}</span>
+                )}
+                {Array.isArray(job.skills) && job.skills.slice(0, 4).map(s => (
+                  <span key={s} className="badge badge-purple">{s}</span>
+                ))}
                 <span className="badge badge-green">Actively Hiring</span>
               </div>
               {job.salary && (
