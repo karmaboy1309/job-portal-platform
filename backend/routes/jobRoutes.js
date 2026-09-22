@@ -64,11 +64,11 @@ router.get('/my-applications', auth, async (req, res) => {
   }
 });
 
-// Get all Jobs with optional search and type filtering
+// Get all Jobs with optional search and type filtering (only active listings)
 router.get('/', async (req, res) => {
   try {
     const { search, type, location } = req.query;
-    const filter = {};
+    const filter = { isActive: true };
     if (type && type !== 'All') {
       filter.type = type;
     }
@@ -168,7 +168,7 @@ router.put('/:id', auth, async (req, res) => {
     if (String(job.owner) !== String(req.user._id) && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    const allowed = ['title', 'description', 'company', 'location', 'salary', 'type', 'skills', 'experience', 'deadline'];
+    const allowed = ['title', 'description', 'company', 'location', 'salary', 'type', 'skills', 'experience', 'deadline', 'isActive'];
     allowed.forEach((field) => {
       if (req.body[field] !== undefined) job[field] = req.body[field];
     });

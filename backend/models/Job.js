@@ -42,6 +42,11 @@ const JobSchema = new mongoose.Schema({
     type: Date,
     required: false
   },
+  // Whether the listing is currently open for applications
+  isActive: {
+    type: Boolean,
+    default: true
+  },
   owner: { type: require('mongoose').Schema.Types.ObjectId, ref: 'User' },
   createdAt: {
     type: Date,
