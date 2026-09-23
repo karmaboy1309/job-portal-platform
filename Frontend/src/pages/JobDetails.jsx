@@ -90,6 +90,18 @@ const JobDetails = () => {
                 {job.createdAt && (
                   <span className="job-detail-meta">📅 Posted {new Date(job.createdAt).toLocaleDateString()}</span>
                 )}
+                {job.deadline && (() => {
+                  const daysLeft = Math.ceil((new Date(job.deadline) - Date.now()) / 86400000);
+                  const isUrgent = daysLeft >= 0 && daysLeft <= 3;
+                  const isExpired = daysLeft < 0;
+                  return (
+                    <span className="job-detail-meta" style={{ color: isExpired ? 'var(--clr-danger, #ef4444)' : isUrgent ? 'var(--clr-warning, #f59e0b)' : 'inherit' }}>
+                      ⏰ Deadline: {new Date(job.deadline).toLocaleDateString()}
+                      {isUrgent && !isExpired && <span className="badge badge-red" style={{ marginLeft: 6 }}>Closing soon!</span>}
+                      {isExpired && <span className="badge badge-red" style={{ marginLeft: 6 }}>Closed</span>}
+                    </span>
+                  );
+                })()}
               </div>
               <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 <span className="badge badge-blue">{job.type || 'Full-time'}</span>
