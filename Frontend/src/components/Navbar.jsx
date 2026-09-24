@@ -41,6 +41,14 @@ const Navbar = () => {
               >
                 📊 Dashboard
               </NavLink>
+              {user.role === 'seeker' && (
+                <NavLink
+                  to="/my-applications"
+                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                >
+                  📋 My Applications
+                </NavLink>
+              )}
               {(user.role === 'employer' || user.role === 'admin') && (
                 <NavLink
                   to="/create"

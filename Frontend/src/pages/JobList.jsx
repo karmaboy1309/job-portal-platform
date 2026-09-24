@@ -15,12 +15,15 @@ const SAMPLE_JOBS = [
   { _id: 's6', title: 'iOS Developer', company: 'AppForge', location: 'Remote', salary: 98000, description: 'Develop and ship high-quality iOS applications using Swift and SwiftUI.' },
 ];
 
+const FILTER_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance', 'Remote'];
+
 const JobList = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
+  const [selectedType, setSelectedType] = useState('All');
 
   useEffect(() => {
     fetchJobs();
@@ -50,13 +53,23 @@ const JobList = () => {
   };
 
   const displayJobs = (jobs.length > 0 ? jobs : (error ? SAMPLE_JOBS : []));
-  const filtered = search.trim()
-    ? displayJobs.filter(j =>
-      [j.title, j.company, j.location].join(' ')
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    )
-    : displayJobs;
+  const filtered = displayJobs.filter(j => {
+    const term = search.trim().toLowerCase();
+    const matchesSearch = !term || [j.title, j.company, j.location, j.description]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(term);
+
+    const jobType = j.type || 'Full-time';
+    const matchesType = selectedType === 'All'
+      ? true
+      : selectedType === 'Remote'
+        ? (j.location && j.location.toLowerCase().includes('remote'))
+        : jobType.toLowerCase() === selectedType.toLowerCase();
+
+    return matchesSearch && matchesType;
+  });
 
   return (
     <div className="page-wrapper">
@@ -83,10 +96,55 @@ const JobList = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
+          {search && (
+            <button
+              type="button"
+              className="search-clear-btn"
+              onClick={() => setSearch('')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--clr-text-muted)', fontSize: 14 }}
+              title="Clear search"
+            >
+              ✕
+            </button>
+          )}
         </div>
         <button className="btn btn-secondary" onClick={fetchJobs}>
           🔄 Refresh
         </button>
+      </div>
+
+      {/* Filter Chips */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+        {FILTER_TYPES.map(type => {
+          const isActive = selectedType === type;
+          return (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setSelectedType(type)}
+              className={`badge ${isActive ? 'badge-blue' : ''}`}
+              style={{
+                padding: '7px 14px',
+                cursor: 'pointer',
+                borderRadius: 'var(--radius-full)',
+                fontSize: 13,
+                fontWeight: 600,
+                border: isActive
+                  ? '1px solid var(--clr-primary)'
+                  : '1px solid var(--clr-border)',
+                background: isActive
+                  ? 'rgba(79, 125, 255, 0.18)'
+                  : 'var(--clr-surface-2)',
+                color: isActive
+                  ? 'var(--clr-primary-light)'
+                  : 'var(--clr-text-secondary)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {type === 'Remote' ? '🌍 Remote' : type}
+            </button>
+          );
+        })}
       </div>
 
       {/* Error */}
