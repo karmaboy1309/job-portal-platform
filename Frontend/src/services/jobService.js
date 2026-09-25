@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/jobs";
 
+// Fetch jobs with optional filters: search, type, location, minSalary, maxSalary
 export const getJobs = async (params = {}) => {
   const searchParams = new URLSearchParams();
   Object.keys(params).forEach((k) => {
@@ -12,7 +13,7 @@ export const getJobs = async (params = {}) => {
 
   const url = `${API_URL}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
   const res = await axios.get(url);
-  return res.data; // { data, total, page, pages }
+  return res.data; // { data, total }
 };
 
 export const getJobById = async (id) => {
@@ -54,4 +55,9 @@ export const getMyApplications = async () => {
 export const getJobApplications = async (jobId) => {
   const res = await axios.get(`${API_URL}/${jobId}/applications`);
   return res.data;
+};
+
+// Convenience helper: fetch only jobs within a salary range
+export const getJobsBySalary = async (minSalary, maxSalary, extraParams = {}) => {
+  return getJobs({ ...extraParams, minSalary, maxSalary });
 };

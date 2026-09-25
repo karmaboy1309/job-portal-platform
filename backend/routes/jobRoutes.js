@@ -64,16 +64,21 @@ router.get('/my-applications', auth, async (req, res) => {
   }
 });
 
-// Get all Jobs with optional search and type filtering (only active listings)
+// Get all Jobs with optional search, type, and salary range filtering (only active listings)
 router.get('/', async (req, res) => {
   try {
-    const { search, type, location } = req.query;
+    const { search, type, location, minSalary, maxSalary } = req.query;
     const filter = { isActive: true };
     if (type && type !== 'All') {
       filter.type = type;
     }
     if (location) {
       filter.location = { $regex: location, $options: 'i' };
+    }
+    if (minSalary || maxSalary) {
+      filter.salary = {};
+      if (minSalary) filter.salary.$gte = Number(minSalary);
+      if (maxSalary) filter.salary.$lte = Number(maxSalary);
     }
     if (search) {
       filter.$or = [
