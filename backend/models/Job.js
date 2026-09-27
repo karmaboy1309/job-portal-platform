@@ -42,6 +42,11 @@ const JobSchema = new mongoose.Schema({
     type: Date,
     required: false
   },
+  // Featured flag for highlighting jobs
+  isFeatured: {
+    type: Boolean,
+    default: false
+  },
   // Whether the listing is currently open for applications
   isActive: {
     type: Boolean,

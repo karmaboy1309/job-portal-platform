@@ -10,10 +10,14 @@ router.post('/create', auth, async (req, res) => {
     if (req.user.role !== 'employer' && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    const { title, company, location, description, salary, type } = req.body;
+    const { title, company, location, description, salary, type, skills, experience, deadline, isFeatured } = req.body;
     if (!title?.trim() || !company?.trim() || !location?.trim() || !description?.trim()) {
       return res.status(400).json({ message: 'Title, company, location, and description are required' });
     }
+    const parsedSkills = Array.isArray(skills)
+      ? skills.map(s => String(s).trim()).filter(Boolean)
+      : (typeof skills === 'string' ? skills.split(',').map(s => s.trim()).filter(Boolean) : []);
+
     const payload = {
       title: title.trim(),
       company: company.trim(),
@@ -21,6 +25,10 @@ router.post('/create', auth, async (req, res) => {
       description: description.trim(),
       salary: salary ? Number(salary) : undefined,
       type: type || 'Full-time',
+      skills: parsedSkills,
+      experience: experience || 'Entry Level',
+      deadline: deadline ? new Date(deadline) : undefined,
+      isFeatured: Boolean(isFeatured),
       owner: req.user._id
     };
     const newJob = new Job(payload);
