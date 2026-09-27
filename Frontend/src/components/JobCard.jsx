@@ -16,6 +16,33 @@ const JobCard = ({ job, onDelete }) => {
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [isSaved, setIsSaved] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+      return saved.includes(job._id);
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSave = (e) => {
+    e.stopPropagation();
+    try {
+      const saved = JSON.parse(localStorage.getItem('savedJobs') || '[]');
+      let updated;
+      if (saved.includes(job._id)) {
+        updated = saved.filter(id => id !== job._id);
+        setIsSaved(false);
+      } else {
+        updated = [...saved, job._id];
+        setIsSaved(true);
+      }
+      localStorage.setItem('savedJobs', JSON.stringify(updated));
+      window.dispatchEvent(new Event('savedJobsUpdated'));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const handleApply = async (e) => {
     e.stopPropagation();
@@ -110,6 +137,29 @@ const JobCard = ({ job, onDelete }) => {
           {expLevel && (
             <span className="badge badge-green">{expLevel}</span>
           )}
+          {/* Featured badge */}
+          {job.isFeatured && (
+            <span className="badge badge-amber" style={{ marginLeft: 4 }}>⭐ Featured</span>
+          )}
+          {/* New badge for recent postings */}
+          {(() => {
+            const created = new Date(job.createdAt);
+            const now = new Date();
+            const diffDays = (now - created) / (1000 * 60 * 60 * 24);
+            return diffDays <= 2 ? (
+              <span className="badge badge-red" style={{ marginLeft: 4 }}>New</span>
+            ) : null;
+          })()}
+          {/* Reactive Save button */}
+          <button
+            type="button"
+            className={`btn btn-sm ${isSaved ? 'btn-secondary' : 'btn-ghost'}`}
+            style={{ marginLeft: 'auto', padding: '3px 8px', fontSize: 12 }}
+            onClick={toggleSave}
+            title={isSaved ? 'Remove from saved' : 'Save job'}
+          >
+            {isSaved ? '🔖 Saved' : '🤍 Save'}
+          </button>
         </div>
       )}
 
