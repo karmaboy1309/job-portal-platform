@@ -6,6 +6,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
 
 const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
+const EXPERIENCE_LEVELS = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Manager'];
 
 const CreateJob = () => {
   const navigate = useNavigate();
@@ -13,6 +14,10 @@ const CreateJob = () => {
   const [formData, setFormData] = useState({
     title: '', company: '', salary: '', location: '', description: '',
     type: 'Full-time',
+    skills: '',
+    experience: 'Entry Level',
+    deadline: '',
+    isFeatured: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,7 +41,13 @@ const CreateJob = () => {
     }
     try {
       setLoading(true);
-      await createJob({ ...formData, salary: salaryNumber });
+      const payload = {
+        ...formData,
+        salary: salaryNumber,
+        skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
+        deadline: formData.deadline || undefined,
+      };
+      await createJob(payload);
       setSuccess(true);
       setTimeout(() => navigate('/jobs'), 1500);
     } catch (err) {
@@ -186,6 +197,59 @@ const CreateJob = () => {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="cj-exp">Experience Level</label>
+                <select
+                  id="cj-exp"
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                >
+                  {EXPERIENCE_LEVELS.map(exp => (
+                    <option key={exp} value={exp}>{exp}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="cj-deadline">Application Deadline (Optional)</label>
+                <input
+                  id="cj-deadline"
+                  type="date"
+                  name="deadline"
+                  value={formData.deadline}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="cj-skills">Required Skills</label>
+              <input
+                id="cj-skills"
+                type="text"
+                name="skills"
+                placeholder="e.g. React, Node.js, TypeScript, Docker"
+                value={formData.skills}
+                onChange={handleChange}
+              />
+              <span className="form-hint">Separate skills with commas (e.g. React, MongoDB)</span>
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+              <input
+                id="cj-featured"
+                type="checkbox"
+                name="isFeatured"
+                checked={formData.isFeatured}
+                onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
+                style={{ width: 'auto', cursor: 'pointer' }}
+              />
+              <label htmlFor="cj-featured" style={{ marginBottom: 0, cursor: 'pointer', fontWeight: 600 }}>
+                ⭐ Mark as Featured Listing (prominently highlighted to applicants)
+              </label>
             </div>
 
             <div className="form-group">
