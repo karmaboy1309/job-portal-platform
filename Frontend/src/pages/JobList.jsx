@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getJobs, deleteJob } from '../services/jobService';
+import { getJobs, deleteJob, getSavedJobIds } from '../services/jobService';
 import JobCard from '../components/JobCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -24,9 +24,14 @@ const JobList = () => {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState('All');
+  const [savedIds, setSavedIds] = useState(() => getSavedJobIds());
+  const [onlySaved, setOnlySaved] = useState(false);
 
   useEffect(() => {
     fetchJobs();
+    const handleSavedChange = () => setSavedIds(getSavedJobIds());
+    window.addEventListener('savedJobsUpdated', handleSavedChange);
+    return () => window.removeEventListener('savedJobsUpdated', handleSavedChange);
   }, []);
 
   const fetchJobs = async () => {
@@ -68,7 +73,9 @@ const JobList = () => {
         ? (j.location && j.location.toLowerCase().includes('remote'))
         : jobType.toLowerCase() === selectedType.toLowerCase();
 
-    return matchesSearch && matchesType;
+    const matchesSaved = !onlySaved || savedIds.includes(j._id);
+
+    return matchesSearch && matchesType && matchesSaved;
   });
 
   return (
@@ -114,7 +121,7 @@ const JobList = () => {
       </div>
 
       {/* Filter Chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 24 }}>
         {FILTER_TYPES.map(type => {
           const isActive = selectedType === type;
           return (
@@ -145,6 +152,27 @@ const JobList = () => {
             </button>
           );
         })}
+
+        {/* Saved Jobs filter toggle */}
+        <button
+          type="button"
+          onClick={() => setOnlySaved(!onlySaved)}
+          className={`badge ${onlySaved ? 'badge-amber' : ''}`}
+          style={{
+            marginLeft: 'auto',
+            padding: '7px 14px',
+            cursor: 'pointer',
+            borderRadius: 'var(--radius-full)',
+            fontSize: 13,
+            fontWeight: 600,
+            border: onlySaved ? '1px solid var(--clr-warning, #f59e0b)' : '1px solid var(--clr-border)',
+            background: onlySaved ? 'rgba(245, 158, 11, 0.2)' : 'var(--clr-surface-2)',
+            color: onlySaved ? 'var(--clr-warning, #f59e0b)' : 'var(--clr-text-secondary)',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          {onlySaved ? '🔖 Saved Only' : '🔖 Saved'} ({savedIds.length})
+        </button>
       </div>
 
       {/* Error */}
