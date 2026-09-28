@@ -57,6 +57,33 @@ export const getJobApplications = async (jobId) => {
   return res.data;
 };
 
+export const updateApplicationStatus = async (jobId, appId, { status, note }) => {
+  const res = await axios.patch(`${API_URL}/${jobId}/applications/${appId}`, { status, note });
+  return res.data;
+};
+
+// Local bookmark helpers
+export const getSavedJobIds = () => {
+  try {
+    return JSON.parse(localStorage.getItem('savedJobs') || '[]');
+  } catch {
+    return [];
+  }
+};
+
+export const isJobSaved = (jobId) => {
+  return getSavedJobIds().includes(jobId);
+};
+
+export const toggleSaveJob = (jobId) => {
+  const saved = getSavedJobIds();
+  const exists = saved.includes(jobId);
+  const updated = exists ? saved.filter(id => id !== jobId) : [...saved, jobId];
+  localStorage.setItem('savedJobs', JSON.stringify(updated));
+  window.dispatchEvent(new Event('savedJobsUpdated'));
+  return !exists;
+};
+
 // Convenience helper: fetch only jobs within a salary range
 export const getJobsBySalary = async (minSalary, maxSalary, extraParams = {}) => {
   return getJobs({ ...extraParams, minSalary, maxSalary });
