@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getJobById, applyJob } from '../services/jobService';
+import { getJobById, applyJob, isJobSaved, toggleSaveJob } from '../services/jobService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
@@ -22,9 +22,12 @@ const JobDetails = () => {
   const [error, setError] = useState(null);
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [saved, setSaved] = useState(() => isJobSaved(id));
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchJob();
+    setSaved(isJobSaved(id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -51,6 +54,19 @@ const JobDetails = () => {
       alert(err?.response?.data?.message || 'Failed to apply');
     } finally {
       setApplying(false);
+    }
+  };
+
+  const handleToggleSave = () => {
+    const nextSaved = toggleSaveJob(id);
+    setSaved(nextSaved);
+  };
+
+  const handleShare = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -155,6 +171,20 @@ const JobDetails = () => {
                 🔐 Sign in to Apply
               </button>
             )}
+            <button
+              className={`btn ${saved ? 'btn-secondary' : 'btn-ghost'}`}
+              onClick={handleToggleSave}
+              title={saved ? 'Remove from saved jobs' : 'Save this job'}
+            >
+              {saved ? '🔖 Saved' : '🤍 Save Job'}
+            </button>
+            <button
+              className="btn btn-ghost"
+              onClick={handleShare}
+              title="Copy share link"
+            >
+              {copied ? '✅ Copied!' : '🔗 Share'}
+            </button>
             <button className="btn btn-secondary" onClick={() => navigate('/jobs')}>
               ← All Jobs
             </button>
