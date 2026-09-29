@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getSavedJobIds } from '../services/jobService';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dark, setDark] = useState(() => localStorage.getItem('dark') !== '0');
+  const [savedCount, setSavedCount] = useState(() => getSavedJobIds().length);
 
   useEffect(() => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     localStorage.setItem('dark', dark ? '1' : '0');
   }, [dark]);
+
+  useEffect(() => {
+    const onSavedUpdate = () => setSavedCount(getSavedJobIds().length);
+    window.addEventListener('savedJobsUpdated', onSavedUpdate);
+    return () => window.removeEventListener('savedJobsUpdated', onSavedUpdate);
+  }, []);
 
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
@@ -42,12 +50,23 @@ const Navbar = () => {
                 📊 Dashboard
               </NavLink>
               {user.role === 'seeker' && (
-                <NavLink
-                  to="/my-applications"
-                  className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-                >
-                  📋 My Applications
-                </NavLink>
+                <>
+                  <NavLink
+                    to="/my-applications"
+                    className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  >
+                    📋 My Applications
+                  </NavLink>
+                  {savedCount > 0 && (
+                    <NavLink
+                      to="/jobs"
+                      className="nav-link"
+                      title={`${savedCount} saved job${savedCount > 1 ? 's' : ''}`}
+                    >
+                      🔖 Saved <span className="badge badge-amber" style={{ fontSize: 11, padding: '1px 6px', marginLeft: 4 }}>{savedCount}</span>
+                    </NavLink>
+                  )}
+                </>
               )}
               {(user.role === 'employer' || user.role === 'admin') && (
                 <NavLink
