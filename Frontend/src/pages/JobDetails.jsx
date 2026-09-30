@@ -24,6 +24,8 @@ const JobDetails = () => {
   const [applied, setApplied] = useState(false);
   const [saved, setSaved] = useState(() => isJobSaved(id));
   const [copied, setCopied] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [coverLetter, setCoverLetter] = useState('');
 
   useEffect(() => {
     fetchJob();
@@ -44,12 +46,19 @@ const JobDetails = () => {
     }
   };
 
-  const handleApply = async () => {
+  const handleApplyClick = () => {
+    if (!user) { navigate('/login'); return; }
+    setShowApplyModal(true);
+  };
+
+  const submitApplication = async (e) => {
+    if (e) e.preventDefault();
     if (!user) { navigate('/login'); return; }
     try {
       setApplying(true);
-      await applyJob(id, { coverLetter: '' });
+      await applyJob(id, { coverLetter: coverLetter.trim() });
       setApplied(true);
+      setShowApplyModal(false);
     } catch (err) {
       alert(err?.response?.data?.message || 'Failed to apply');
     } finally {
@@ -152,7 +161,7 @@ const JobDetails = () => {
             {user?.role === 'seeker' ? (
               <button
                 className={`btn btn-lg ${applied ? 'btn-success' : 'btn-primary'}`}
-                onClick={handleApply}
+                onClick={handleApplyClick}
                 disabled={applying || applied}
               >
                 {applied
@@ -188,6 +197,84 @@ const JobDetails = () => {
             <button className="btn btn-secondary" onClick={() => navigate('/jobs')}>
               ← All Jobs
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Application Modal */}
+      {showApplyModal && job && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: 16
+          }}
+          onClick={() => setShowApplyModal(false)}
+        >
+          <div
+            className="card"
+            style={{
+              maxWidth: 540,
+              width: '100%',
+              padding: 24,
+              background: 'var(--clr-surface)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--clr-border)',
+              boxShadow: '0 24px 48px rgba(0,0,0,0.5)',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Apply for {job.title}</h2>
+              <button
+                type="button"
+                onClick={() => setShowApplyModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--clr-text-muted)', fontSize: 20, cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+            <p style={{ color: 'var(--clr-text-secondary)', fontSize: 13, marginBottom: 16 }}>
+              Submitting application to <strong>{job.company}</strong> as <strong>{user?.name}</strong> ({user?.email}).
+            </p>
+            <form onSubmit={submitApplication}>
+              <div className="form-group" style={{ marginBottom: 16 }}>
+                <label htmlFor="modal-cover" style={{ fontSize: 13, fontWeight: 600 }}>
+                  Cover Note / Introduction (Optional)
+                </label>
+                <textarea
+                  id="modal-cover"
+                  rows={5}
+                  value={coverLetter}
+                  onChange={e => setCoverLetter(e.target.value)}
+                  placeholder="Introduce yourself, highlight relevant experience, and explain why you're a great fit for this position…"
+                  style={{ width: '100%', padding: '10px 12px', resize: 'vertical' }}
+                />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => setShowApplyModal(false)}
+                  disabled={applying}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={applying}
+                >
+                  {applying ? 'Submitting…' : '🚀 Submit Application'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
