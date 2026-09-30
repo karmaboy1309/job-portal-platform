@@ -64,6 +64,17 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
+// Get user profile by ID (for employers to view applicant details)
+router.get('/user/:id', auth, async (req, res) => {
+  try {
+    const targetUser = await User.findById(req.params.id).select('name email location bio skills resumeURL role avatarURL createdAt');
+    if (!targetUser) return res.status(404).json({ message: 'User not found' });
+    res.json({ user: targetUser });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Update profile
 router.put('/me', auth, async (req, res) => {
   try {
