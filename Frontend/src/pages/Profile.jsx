@@ -44,6 +44,43 @@ const Profile = () => {
     }
   };
 
+  const [pwdForm, setPwdForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState(null);
+  const [pwdMsgType, setPwdMsgType] = useState('success');
+
+  const handlePwdChange = (e) => setPwdForm({ ...pwdForm, [e.target.name]: e.target.value });
+
+  const savePassword = async (e) => {
+    e.preventDefault();
+    setPwdMsg(null);
+    if (pwdForm.newPassword !== pwdForm.confirmPassword) {
+      setPwdMsg('New passwords do not match');
+      setPwdMsgType('error');
+      return;
+    }
+    if (pwdForm.newPassword.length < 6) {
+      setPwdMsg('New password must be at least 6 characters long');
+      setPwdMsgType('error');
+      return;
+    }
+    try {
+      setPwdSaving(true);
+      await axios.post('http://localhost:5000/api/auth/change-password', {
+        currentPassword: pwdForm.currentPassword,
+        newPassword: pwdForm.newPassword
+      });
+      setPwdMsg('Password updated successfully! ✅');
+      setPwdMsgType('success');
+      setPwdForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err) {
+      setPwdMsg(err?.response?.data?.message || 'Failed to update password');
+      setPwdMsgType('error');
+    } finally {
+      setPwdSaving(false);
+    }
+  };
+
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
@@ -160,6 +197,77 @@ const Profile = () => {
                   Saving…
                 </>
               ) : '💾 Save Profile'}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* Change Password Card */}
+      <div className="profile-form-card" style={{ marginTop: 24 }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Security & Password</h2>
+          <p style={{ fontSize: 13, color: 'var(--clr-text-muted)' }}>
+            Update your account password to keep your account safe.
+          </p>
+        </div>
+
+        {pwdMsg && (
+          <div className={pwdMsgType === 'success' ? 'success-box' : 'error-box'} style={{ marginBottom: 20 }}>
+            <span>{pwdMsgType === 'success' ? '✅' : '⚠️'}</span>
+            <span>{pwdMsg}</span>
+          </div>
+        )}
+
+        <form onSubmit={savePassword}>
+          <div className="form-group">
+            <label htmlFor="pf-cur-pwd">Current Password</label>
+            <input
+              id="pf-cur-pwd"
+              type="password"
+              name="currentPassword"
+              value={pwdForm.currentPassword}
+              onChange={handlePwdChange}
+              placeholder="Enter current password"
+              required
+            />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="pf-new-pwd">New Password</label>
+              <input
+                id="pf-new-pwd"
+                type="password"
+                name="newPassword"
+                value={pwdForm.newPassword}
+                onChange={handlePwdChange}
+                placeholder="At least 6 characters"
+                required
+                minLength={6}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="pf-conf-pwd">Confirm New Password</label>
+              <input
+                id="pf-conf-pwd"
+                type="password"
+                name="confirmPassword"
+                value={pwdForm.confirmPassword}
+                onChange={handlePwdChange}
+                placeholder="Repeat new password"
+                required
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8 }}>
+            <button
+              type="submit"
+              className="btn btn-secondary"
+              disabled={pwdSaving}
+              style={{ minWidth: 160 }}
+            >
+              {pwdSaving ? 'Updating…' : '🔑 Change Password'}
             </button>
           </div>
         </form>
