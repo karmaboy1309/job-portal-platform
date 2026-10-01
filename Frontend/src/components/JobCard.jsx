@@ -100,7 +100,7 @@ const JobCard = ({ job, onDelete }) => {
   const expLevel = job.experience || null;
 
   return (
-    <div className="job-card" onClick={() => navigate(`/jobs/${job._id}`)}>
+    <div className={`job-card ${job.isFeatured ? 'job-card-featured' : ''}`} onClick={() => navigate(`/jobs/${job._id}`)}>
       {/* Top row */}
       <div className="job-card-top">
         <div
