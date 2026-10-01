@@ -16,6 +16,13 @@ const SAMPLE_JOBS = [
 ];
 
 const FILTER_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance', 'Remote'];
+const SALARY_TIERS = [
+  { label: 'All Salaries', value: 0 },
+  { label: '$50k+/yr', value: 50000 },
+  { label: '$75k+/yr', value: 75000 },
+  { label: '$100k+/yr', value: 100000 },
+  { label: '$120k+/yr', value: 120000 },
+];
 
 const JobList = () => {
   const navigate = useNavigate();
@@ -24,6 +31,7 @@ const JobList = () => {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState('All');
+  const [minSalary, setMinSalary] = useState(0);
   const [savedIds, setSavedIds] = useState(() => getSavedJobIds());
   const [onlySaved, setOnlySaved] = useState(false);
 
@@ -74,8 +82,9 @@ const JobList = () => {
         : jobType.toLowerCase() === selectedType.toLowerCase();
 
     const matchesSaved = !onlySaved || savedIds.includes(j._id);
+    const matchesSalary = !minSalary || (j.salary && Number(j.salary) >= minSalary);
 
-    return matchesSearch && matchesType && matchesSaved;
+    return matchesSearch && matchesType && matchesSaved && matchesSalary;
   });
 
   return (
@@ -115,6 +124,30 @@ const JobList = () => {
             </button>
           )}
         </div>
+
+        {/* Salary filter selector */}
+        <select
+          value={minSalary}
+          onChange={e => setMinSalary(Number(e.target.value))}
+          style={{
+            padding: '10px 14px',
+            background: 'var(--clr-surface)',
+            border: '1px solid var(--clr-border)',
+            borderRadius: 'var(--radius-md)',
+            color: minSalary ? 'var(--clr-primary-light)' : 'var(--clr-text-secondary)',
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+            minWidth: 130
+          }}
+        >
+          {SALARY_TIERS.map(tier => (
+            <option key={tier.value} value={tier.value}>
+              💰 {tier.label}
+            </option>
+          ))}
+        </select>
+
         <button className="btn btn-secondary" onClick={fetchJobs}>
           🔄 Refresh
         </button>
