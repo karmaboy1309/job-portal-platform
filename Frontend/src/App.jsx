@@ -12,6 +12,7 @@ import { AuthProvider } from "./context/AuthContext";
 import "./App.css";
 import Welcome from "./pages/Welcome";
 import PrivateRoute from "./components/PrivateRoute";
+import NotFound from "./pages/NotFound";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
@@ -46,6 +47,9 @@ const AppRoutes = () => {
         <Route path="/my-applications" element={<MyApplications />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
+
+      {/* Catch-all 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
