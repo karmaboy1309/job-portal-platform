@@ -22,6 +22,17 @@ app.get('/', (req, res) => {
 app.use('/api/jobs', require('./routes/jobRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 
+// Health-check endpoint – returns server uptime + DB state
+app.get('/api/health', (req, res) => {
+  const dbState = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  res.json({
+    status: 'ok',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+    db: dbState[mongoose.connection.readyState] ?? 'unknown',
+  });
+});
+
 // MongoDB Connection: prefer MONGO_URI, fallback to in-memory server for dev
 const connectMongo = async () => {
   try {
