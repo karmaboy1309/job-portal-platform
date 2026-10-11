@@ -4,6 +4,7 @@ import { getJobById, applyJob, isJobSaved, toggleSaveJob } from '../services/job
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
+import { formatRelativeTime, formatDate, formatDeadline } from '../utils/formatDate';
 
 const COMPANY_COLORS = [
   'linear-gradient(135deg,#4f7dff,#7c3aed)',

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { applyJob } from '../services/jobService';
+import { formatRelativeTime, formatDeadline } from '../utils/formatDate';
 
 const COMPANY_COLORS = [
   'linear-gradient(135deg,#4f7dff,#7c3aed)',
@@ -82,20 +83,8 @@ const JobCard = ({ job, onDelete }) => {
     ? `$${Number(job.salary).toLocaleString()}`
     : null;
 
-  // Relative time helper
-  const timeAgo = (date) => {
-    if (!date) return null;
-    const diff = Math.floor((Date.now() - new Date(date)) / 1000);
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    const days = Math.floor(diff / 86400);
-    if (days === 1) return '1 day ago';
-    if (days < 30) return `${days} days ago`;
-    return new Date(date).toLocaleDateString();
-  };
-
-  const postedAgo = timeAgo(job.createdAt);
+  const postedAgo = formatRelativeTime(job.createdAt);
+  const deadlineInfo = job.deadline ? formatDeadline(job.deadline) : null;
   const skillTags = Array.isArray(job.skills) ? job.skills.slice(0, 3) : [];
   const expLevel = job.experience || null;
 
@@ -123,6 +112,11 @@ const JobCard = ({ job, onDelete }) => {
           </span>
         )}
         <span className="badge badge-blue">{job.type || 'Full-time'}</span>
+        {deadlineInfo && (
+          <span className={`badge ${deadlineInfo.isExpired ? 'badge-red' : deadlineInfo.isUrgent ? 'badge-amber' : 'badge-slate'}`}>
+            {deadlineInfo.label}
+          </span>
+        )}
         {job.location && job.location.toLowerCase().includes('remote') && (
           <span className="badge badge-purple">Remote</span>
         )}
