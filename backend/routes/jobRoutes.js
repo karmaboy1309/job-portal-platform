@@ -10,7 +10,7 @@ router.post('/create', auth, async (req, res) => {
     if (req.user.role !== 'employer' && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    const { title, company, location, description, salary, type, skills, experience, deadline, isFeatured } = req.body;
+    const { title, company, location, description, salary, type, workMode, category, skills, experience, deadline, isFeatured } = req.body;
     if (!title?.trim() || !company?.trim() || !location?.trim() || !description?.trim()) {
       return res.status(400).json({ message: 'Title, company, location, and description are required' });
     }
@@ -25,6 +25,8 @@ router.post('/create', auth, async (req, res) => {
       description: description.trim(),
       salary: salary ? Number(salary) : undefined,
       type: type || 'Full-time',
+      workMode: ['On-site', 'Remote', 'Hybrid'].includes(workMode) ? workMode : 'On-site',
+      category: ['Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Customer Support', 'Other'].includes(category) ? category : 'Engineering',
       skills: parsedSkills,
       experience: experience || 'Entry Level',
       deadline: deadline ? new Date(deadline) : undefined,
@@ -75,7 +77,7 @@ router.get('/my-applications', auth, async (req, res) => {
 // Get all Jobs with optional search, type, and salary range filtering (only active listings)
 router.get('/', async (req, res) => {
   try {
-    const { search, type, location, minSalary, maxSalary } = req.query;
+    const { search, type, location, minSalary, maxSalary, workMode, category } = req.query;
     const filter = { isActive: true };
     if (type && type !== 'All') {
       filter.type = type;
@@ -181,7 +183,7 @@ router.put('/:id', auth, async (req, res) => {
     if (String(job.owner) !== String(req.user._id) && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    const allowed = ['title', 'description', 'company', 'location', 'salary', 'type', 'skills', 'experience', 'deadline', 'isActive'];
+    const allowed = ['title', 'description', 'company', 'location', 'salary', 'type', 'workMode', 'category', 'skills', 'experience', 'deadline', 'isActive'];
     allowed.forEach((field) => {
       if (req.body[field] !== undefined) job[field] = req.body[field];
     });
