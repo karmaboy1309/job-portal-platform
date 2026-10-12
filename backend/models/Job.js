@@ -26,6 +26,18 @@ const JobSchema = new mongoose.Schema({
     enum: ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'],
     default: 'Full-time'
   },
+  // Work mode: On-site, Remote, or Hybrid
+  workMode: {
+    type: String,
+    enum: ['On-site', 'Remote', 'Hybrid'],
+    default: 'On-site'
+  },
+  // Job category / domain
+  category: {
+    type: String,
+    enum: ['Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Customer Support', 'Other'],
+    default: 'Engineering'
+  },
   // Skills required for the job (e.g. ['React', 'Node.js'])
   skills: {
     type: [String],
