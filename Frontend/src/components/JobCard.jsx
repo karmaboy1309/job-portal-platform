@@ -117,8 +117,15 @@ const JobCard = ({ job, onDelete }) => {
             {deadlineInfo.label}
           </span>
         )}
-        {job.location && job.location.toLowerCase().includes('remote') && (
+        {job.workMode ? (
+          <span className={`badge badge-workmode-${job.workMode.toLowerCase().replace('-', '')}`}>
+            {job.workMode}
+          </span>
+        ) : (job.location && job.location.toLowerCase().includes('remote') && (
           <span className="badge badge-purple">Remote</span>
+        ))}
+        {job.category && (
+          <span className="badge-category">{job.category}</span>
         )}
       </div>
 
