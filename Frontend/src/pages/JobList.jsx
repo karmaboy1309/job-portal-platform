@@ -15,7 +15,9 @@ const SAMPLE_JOBS = [
   { _id: 's6', title: 'iOS Developer', company: 'AppForge', location: 'Remote', salary: 98000, description: 'Develop and ship high-quality iOS applications using Swift and SwiftUI.' },
 ];
 
-const FILTER_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance', 'Remote'];
+const FILTER_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
+const WORK_MODE_FILTERS = ['All Work Modes', 'On-site', 'Remote', 'Hybrid'];
+const CATEGORY_FILTERS = ['All Categories', 'Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Customer Support', 'Other'];
 const SALARY_TIERS = [
   { label: 'All Salaries', value: 0 },
   { label: '$50k+/yr', value: 50000 },
@@ -32,6 +34,8 @@ const JobList = () => {
   const [search, setSearch] = useState('');
   const [selectedType, setSelectedType] = useState('All');
   const [minSalary, setMinSalary] = useState(0);
+  const [selectedWorkMode, setSelectedWorkMode] = useState('All Work Modes');
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [savedIds, setSavedIds] = useState(() => getSavedJobIds());
   const [onlySaved, setOnlySaved] = useState(false);
 
