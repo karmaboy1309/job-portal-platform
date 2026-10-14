@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 
 const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
 const EXPERIENCE_LEVELS = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Manager'];
+const WORK_MODES = ['On-site', 'Remote', 'Hybrid'];
+const CATEGORIES = ['Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Customer Support', 'Other'];
 
 const CreateJob = () => {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ const CreateJob = () => {
   const [formData, setFormData] = useState({
     title: '', company: '', salary: '', location: '', description: '',
     type: 'Full-time',
+    workMode: 'On-site',
+    category: 'Engineering',
     skills: '',
     experience: 'Entry Level',
     deadline: '',
