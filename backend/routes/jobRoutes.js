@@ -77,10 +77,16 @@ router.get('/my-applications', auth, async (req, res) => {
 // Get all Jobs with optional search, type, and salary range filtering (only active listings)
 router.get('/', async (req, res) => {
   try {
-    const { search, type, location, minSalary, maxSalary, workMode, category } = req.query;
+    const { search, type, location, minSalary, maxSalary, workMode, category, page = 1, limit = 20, sortBy = 'newest' } = req.query;
     const filter = { isActive: true };
     if (type && type !== 'All') {
       filter.type = type;
+    }
+    if (workMode && workMode !== 'All' && workMode !== 'All Work Modes') {
+      filter.workMode = workMode;
+    }
+    if (category && category !== 'All' && category !== 'All Categories') {
+      filter.category = category;
     }
     if (location) {
       filter.location = { $regex: location, $options: 'i' };
@@ -97,8 +103,29 @@ router.get('/', async (req, res) => {
         { description: { $regex: search, $options: 'i' } }
       ];
     }
-    const jobs = await Job.find(filter).sort({ createdAt: -1 });
-    res.status(200).json({ data: jobs, total: jobs.length });
+
+    // Determine sort options
+    let sortOptions = { createdAt: -1 };
+    if (sortBy === 'salary-desc') sortOptions = { salary: -1, createdAt: -1 };
+    else if (sortBy === 'salary-asc') sortOptions = { salary: 1, createdAt: -1 };
+    else if (sortBy === 'deadline') sortOptions = { deadline: 1, createdAt: -1 };
+
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 20));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [total, jobs] = await Promise.all([
+      Job.countDocuments(filter),
+      Job.find(filter).sort(sortOptions).skip(skip).limit(limitNum)
+    ]);
+
+    res.status(200).json({
+      data: jobs,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / limitNum) || 1
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
