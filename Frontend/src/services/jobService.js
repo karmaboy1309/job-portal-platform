@@ -88,3 +88,11 @@ export const toggleSaveJob = (jobId) => {
 export const getJobsBySalary = async (minSalary, maxSalary, extraParams = {}) => {
   return getJobs({ ...extraParams, minSalary, maxSalary });
 };
+
+
+/**
+ * Convenience helper to fetch paginated jobs with custom page and limit
+ */
+export const getPaginatedJobs = async (page = 1, limit = 10, filters = {}) => {
+  return getJobs({ ...filters, page, limit });
+};
