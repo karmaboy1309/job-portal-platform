@@ -4,6 +4,7 @@ import JobCard from '../components/JobCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
+import Pagination from '../components/Pagination';
 import { useNavigate } from 'react-router-dom';
 
 const SAMPLE_JOBS = [
@@ -18,6 +19,13 @@ const SAMPLE_JOBS = [
 const FILTER_TYPES = ['All', 'Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
 const WORK_MODE_FILTERS = ['All Work Modes', 'On-site', 'Remote', 'Hybrid'];
 const CATEGORY_FILTERS = ['All Categories', 'Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Customer Support', 'Other'];
+const SORT_OPTIONS = [
+  { label: 'Newest First', value: 'newest' },
+  { label: 'Salary: High to Low', value: 'salary-desc' },
+  { label: 'Salary: Low to High', value: 'salary-asc' },
+  { label: 'Application Deadline', value: 'deadline' }
+];
+
 const SALARY_TIERS = [
   { label: 'All Salaries', value: 0 },
   { label: '$50k+/yr', value: 50000 },
@@ -36,6 +44,9 @@ const JobList = () => {
   const [minSalary, setMinSalary] = useState(0);
   const [selectedWorkMode, setSelectedWorkMode] = useState('All Work Modes');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [sortBy, setSortBy] = useState('newest');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 6;
   const [savedIds, setSavedIds] = useState(() => getSavedJobIds());
   const [onlySaved, setOnlySaved] = useState(false);
 
@@ -149,6 +160,27 @@ const JobList = () => {
             <option key={tier.value} value={tier.value}>
               💰 {tier.label}
             </option>
+          ))}
+        </select>
+
+                {/* Sort Selector */}
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value)}
+          style={{
+            padding: '10px 14px',
+            background: 'var(--clr-surface)',
+            border: '1px solid var(--clr-border)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--clr-text)',
+            fontSize: 13,
+            fontWeight: 600,
+            cursor: 'pointer',
+            minWidth: 150
+          }}
+        >
+          {SORT_OPTIONS.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
 
