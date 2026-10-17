@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getMyApplications } from '../services/jobService';
+import { getMyApplications, withdrawApplication } from '../services/jobService';
+import { formatDate, formatRelativeTime } from '../utils/formatDate';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
@@ -28,6 +29,18 @@ const MyApplications = () => {
       setError(err?.response?.data?.message || err.message || 'Failed to load applications');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleWithdraw = async (appId, jobTitle) => {
+    if (!window.confirm(`Are you sure you want to withdraw your application for "${jobTitle || 'this role'}"?`)) {
+      return;
+    }
+    try {
+      await withdrawApplication(appId);
+      setApplications(prev => prev.filter(a => a._id !== appId));
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to withdraw application');
     }
   };
 
@@ -153,6 +166,16 @@ const MyApplications = () => {
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     {getStatusBadge(app.status)}
+                    {app.status === 'pending' && (
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        style={{ color: 'var(--clr-danger, #ef4444)', fontSize: 13 }}
+                        onClick={() => handleWithdraw(app._id, job.title)}
+                        title="Withdraw this application"
+                      >
+                        Withdraw
+                      </button>
+                    )}
                     <button
                       className="btn btn-ghost btn-sm"
                       onClick={() => navigate(`/jobs/${job._id}`)}
@@ -177,7 +200,7 @@ const MyApplications = () => {
                 )}
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: 'var(--clr-text-muted)', paddingTop: 6, borderTop: '1px solid var(--clr-border)' }}>
-                  <span>Applied on {new Date(app.createdAt).toLocaleDateString()}</span>
+                  <span>Applied {formatRelativeTime(app.createdAt)} ({formatDate(app.createdAt)})</span>
                   {app.reviewedAt && (
                     <span>Reviewed on {new Date(app.reviewedAt).toLocaleDateString()}</span>
                   )}
