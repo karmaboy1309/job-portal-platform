@@ -96,3 +96,8 @@ export const getJobsBySalary = async (minSalary, maxSalary, extraParams = {}) =>
 export const getPaginatedJobs = async (page = 1, limit = 10, filters = {}) => {
   return getJobs({ ...filters, page, limit });
 };
+
+export const withdrawApplication = async (appId) => {
+  const res = await axios.delete(`${API_URL}/applications/${appId}`);
+  return res.data;
+};
