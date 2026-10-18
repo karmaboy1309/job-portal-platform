@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import MyApplications from "./pages/MyApplications";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import "./App.css";
 import Welcome from "./pages/Welcome";
 import PrivateRoute from "./components/PrivateRoute";
