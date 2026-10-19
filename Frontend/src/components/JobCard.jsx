@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { applyJob } from '../services/jobService';
 import { formatRelativeTime, formatDeadline } from '../utils/formatDate';
 
@@ -14,6 +15,7 @@ const COMPANY_COLORS = [
 
 const JobCard = ({ job, onDelete }) => {
   const { user } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
@@ -53,7 +55,7 @@ const JobCard = ({ job, onDelete }) => {
       setApplied(true);
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || 'Failed to apply');
+      toast.error(err?.response?.data?.message || 'Failed to apply');
     } finally {
       setApplying(false);
     }

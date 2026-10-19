@@ -4,6 +4,7 @@ import { getJobById, applyJob, isJobSaved, toggleSaveJob } from '../services/job
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { formatRelativeTime, formatDate, formatDeadline } from '../utils/formatDate';
 
 const COMPANY_COLORS = [
@@ -18,6 +19,7 @@ const JobDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const toast = useToast();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
