@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship', 'Freelance'];
 const EXPERIENCE_LEVELS = ['Entry Level', 'Mid Level', 'Senior Level', 'Lead', 'Manager'];
@@ -13,6 +14,7 @@ const CATEGORIES = ['Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'C
 const CreateJob = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const toast = useToast();
   const [formData, setFormData] = useState({
     title: '', company: '', salary: '', location: '', description: '',
     type: 'Full-time',

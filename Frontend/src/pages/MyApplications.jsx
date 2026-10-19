@@ -6,9 +6,11 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import EmptyState from '../components/EmptyState';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const MyApplications = () => {
   const { user } = useAuth();
+  const toast = useToast();
   const navigate = useNavigate();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,8 +41,9 @@ const MyApplications = () => {
     try {
       await withdrawApplication(appId);
       setApplications(prev => prev.filter(a => a._id !== appId));
+      toast.success('Application withdrawn successfully');
     } catch (err) {
-      alert(err?.response?.data?.message || 'Failed to withdraw application');
+      toast.error(err?.response?.data?.message || 'Failed to withdraw application');
     }
   };
 
