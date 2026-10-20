@@ -101,3 +101,19 @@ export const withdrawApplication = async (appId) => {
   const res = await axios.delete(`${API_URL}/applications/${appId}`);
   return res.data;
 };
+
+/**
+ * Fetch all jobs posted by the authenticated employer
+ */
+export const getEmployerJobs = async () => {
+  const res = await axios.get(`${API_URL}/employer/my-jobs`);
+  return res.data;
+};
+
+/**
+ * Toggle job listing between active and paused (inactive)
+ */
+export const toggleJobStatus = async (jobId) => {
+  const res = await axios.patch(`${API_URL}/${jobId}/toggle-status`);
+  return res.data;
+};
