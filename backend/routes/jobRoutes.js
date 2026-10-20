@@ -202,6 +202,23 @@ router.patch('/:id/applications/:appId', auth, async (req, res) => {
   }
 });
 
+
+// Employer: toggle job active/inactive listing status
+router.patch('/:id/toggle-status', auth, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    if (String(job.owner) !== String(req.user._id) && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+    job.isActive = !job.isActive;
+    await job.save();
+    res.status(200).json({ message: 'Job status updated', isActive: job.isActive, job });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update Job by ID (owner or admin)
 router.put('/:id', auth, async (req, res) => {
   try {
