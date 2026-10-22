@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getSavedJobIds } from '../services/jobService';
+import { BriefcaseIcon, DashboardIcon, BookmarkIcon, AddIcon, SunIcon, MoonIcon } from './Icons';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -38,16 +39,20 @@ const Navbar = () => {
           <NavLink
             to="/jobs"
             className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
           >
-            🔍 Jobs
+            <BriefcaseIcon size={15} />
+            <span>Jobs</span>
           </NavLink>
           {user && (
             <>
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
-                📊 Dashboard
+                <DashboardIcon size={15} />
+                <span>Dashboard</span>
               </NavLink>
               {user.role === 'seeker' && (
                 <>
@@ -55,15 +60,18 @@ const Navbar = () => {
                     to="/my-applications"
                     className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
                   >
-                    📋 My Applications
+                    My Applications
                   </NavLink>
                   {savedCount > 0 && (
                     <NavLink
                       to="/jobs"
                       className="nav-link"
                       title={`${savedCount} saved job${savedCount > 1 ? 's' : ''}`}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                     >
-                      🔖 Saved <span className="badge badge-amber" style={{ fontSize: 11, padding: '1px 6px', marginLeft: 4 }}>{savedCount}</span>
+                      <BookmarkIcon size={14} />
+                      <span>Saved</span>
+                      <span className="badge badge-amber" style={{ fontSize: 11, padding: '1px 6px', marginLeft: 2 }}>{savedCount}</span>
                     </NavLink>
                   )}
                 </>
@@ -72,8 +80,10 @@ const Navbar = () => {
                 <NavLink
                   to="/create"
                   className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                 >
-                  ✨ Post Job
+                  <AddIcon size={15} />
+                  <span>Post Job</span>
                 </NavLink>
               )}
             </>
@@ -84,12 +94,15 @@ const Navbar = () => {
         <div className="navbar-right">
           {/* Dark mode toggle */}
           <div className="theme-toggle-wrap">
-            <span className="toggle-label">{dark ? '🌙' : '☀️'}</span>
+            <span className="toggle-label" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {dark ? <MoonIcon size={14} /> : <SunIcon size={14} />}
+            </span>
             <label className="toggle-switch">
               <input
                 type="checkbox"
                 checked={dark}
                 onChange={e => setDark(e.target.checked)}
+                aria-label="Toggle dark mode"
               />
               <span className="toggle-track" />
             </label>
