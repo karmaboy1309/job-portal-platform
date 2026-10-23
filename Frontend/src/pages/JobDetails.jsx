@@ -29,6 +29,8 @@ const JobDetails = () => {
   const [copied, setCopied] = useState(false);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
+  const [resumeURL, setResumeURL] = useState('');
+  const [portfolioURL, setPortfolioURL] = useState('');
 
   useEffect(() => {
     fetchJob();
@@ -59,7 +61,11 @@ const JobDetails = () => {
     if (!user) { navigate('/login'); return; }
     try {
       setApplying(true);
-      await applyJob(id, { coverLetter: coverLetter.trim() });
+      await applyJob(id, {
+        coverLetter: coverLetter.trim(),
+        resumeURL: resumeURL.trim(),
+        portfolioURL: portfolioURL.trim()
+      });
       setApplied(true);
       setShowApplyModal(false);
     } catch (err) {
