@@ -153,7 +153,9 @@ router.post('/:id/apply', auth, async (req, res) => {
     const application = new Application({
       job: job._id,
       applicant: req.user._id,
-      coverLetter: req.body.coverLetter || ''
+      coverLetter: req.body.coverLetter || '',
+      resumeURL: req.body.resumeURL || req.user.resumeURL || '',
+      portfolioURL: req.body.portfolioURL || ''
     });
     await application.save();
     res.status(201).json({ message: 'Application submitted successfully', application });
