@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import MyApplications from "./pages/MyApplications";
+import SavedJobs from "./pages/SavedJobs";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 import "./App.css";
@@ -46,6 +47,7 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create" element={<CreateJob />} />
         <Route path="/my-applications" element={<MyApplications />} />
+        <Route path="/saved-jobs" element={<SavedJobs />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
 

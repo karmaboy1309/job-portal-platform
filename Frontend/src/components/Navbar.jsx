@@ -64,8 +64,8 @@ const Navbar = () => {
                   </NavLink>
                   {savedCount > 0 && (
                     <NavLink
-                      to="/jobs"
-                      className="nav-link"
+                      to="/saved-jobs"
+                      className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
                       title={`${savedCount} saved job${savedCount > 1 ? 's' : ''}`}
                       style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                     >
