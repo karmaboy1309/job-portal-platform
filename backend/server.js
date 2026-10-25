@@ -33,6 +33,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Centralized error handling middlewares
+const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
+app.use(notFoundHandler);
+app.use(errorHandler);
+
 // MongoDB Connection: prefer MONGO_URI, fallback to in-memory server for dev
 const connectMongo = async () => {
   try {
