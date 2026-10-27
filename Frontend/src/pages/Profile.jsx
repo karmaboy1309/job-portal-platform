@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import axios from 'axios';
 
 const Profile = () => {
   const { user, fetchMe } = useAuth();
-  const [form, setForm] = useState({ name: '', email: '', location: '', bio: '', skills: '' });
+  const [form, setForm] = useState({ name: '', email: '', location: '', bio: '', skills: '', githubURL: '', linkedinURL: '', portfolioURL: '' });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState(null);
   const [msgType, setMsgType] = useState('success'); // 'success' or 'error'
@@ -21,6 +22,9 @@ const Profile = () => {
         location: user.location || '',
         bio: user.bio || '',
         skills: user.skills?.join ? user.skills.join(', ') : (user.skills || ''),
+        githubURL: user.githubURL || '',
+        linkedinURL: user.linkedinURL || '',
+        portfolioURL: user.portfolioURL || '',
       });
     }
   }, [user]);
@@ -32,9 +36,10 @@ const Profile = () => {
     try {
       setSaving(true);
       setMsg(null);
-      const payload = { name: form.name, location: form.location, bio: form.bio, skills: form.skills };
+      const payload = { name: form.name, location: form.location, bio: form.bio, skills: form.skills, githubURL: form.githubURL, linkedinURL: form.linkedinURL, portfolioURL: form.portfolioURL };
       await axios.put('http://localhost:5000/api/auth/me', payload);
       setMsg('Profile updated successfully! ✅');
+      toast.success('Profile updated successfully!');
       setMsgType('success');
     } catch (err) {
       setMsg(err?.response?.data?.message || 'Failed to save profile');
