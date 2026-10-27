@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
@@ -7,7 +8,10 @@ const UserSchema = new mongoose.Schema({
   location: { type: String },
   bio: { type: String },
   skills: { type: [String], default: [] },
-  resumeURL: { type: String },
+  resumeURL: { type: String, default: '' },
+  githubURL: { type: String, default: '' },
+  linkedinURL: { type: String, default: '' },
+  portfolioURL: { type: String, default: '' },
   // Profile picture URL
   avatarURL: { type: String, default: '' },
   // Soft delete / deactivation flag

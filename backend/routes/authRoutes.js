@@ -67,7 +67,7 @@ router.get('/me', auth, async (req, res) => {
 // Get user profile by ID (for employers to view applicant details)
 router.get('/user/:id', auth, async (req, res) => {
   try {
-    const targetUser = await User.findById(req.params.id).select('name email location bio skills resumeURL role avatarURL createdAt');
+    const targetUser = await User.findById(req.params.id).select('name email location bio skills resumeURL githubURL linkedinURL portfolioURL role avatarURL createdAt');
     if (!targetUser) return res.status(404).json({ message: 'User not found' });
     res.json({ user: targetUser });
   } catch (err) {
@@ -78,7 +78,7 @@ router.get('/user/:id', auth, async (req, res) => {
 // Update profile
 router.put('/me', auth, async (req, res) => {
   try {
-    const updates = (({ name, location, bio, skills, resumeURL, avatarURL }) => ({ name, location, bio, skills, resumeURL, avatarURL }))(req.body);
+    const updates = (({ name, location, bio, skills, resumeURL, avatarURL, githubURL, linkedinURL, portfolioURL }) => ({ name, location, bio, skills, resumeURL, avatarURL, githubURL, linkedinURL, portfolioURL }))(req.body);
     if (updates.skills && !Array.isArray(updates.skills)) updates.skills = String(updates.skills).split(',').map(s=>s.trim());
     const user = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true }).select('-passwordHash');
     res.json({ user });
