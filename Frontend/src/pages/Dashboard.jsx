@@ -3,7 +3,8 @@ import { getStats, getJobs, getMyApplications } from '../services/jobService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { BriefcaseIcon, BookmarkIcon, DashboardIcon, CheckIcon } from '../components/Icons';
 
 const Dashboard = () => {
   const { user } = useAuth();
