@@ -63,4 +63,27 @@ const connectMongo = async () => {
 connectMongo();
 
 // Start server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Graceful shutdown handling
+const gracefulShutdown = async (signal) => {
+  console.log(`\nReceived ${signal}. Gracefully shutting down...`);
+  server.close(async () => {
+    console.log('HTTP server closed.');
+    try {
+      await mongoose.connection.close(false);
+      console.log('MongoDB connection closed.');
+      if (process._mongod) {
+        await process._mongod.stop();
+        console.log('In-memory MongoDB stopped.');
+      }
+      process.exit(0);
+    } catch (err) {
+      console.error('Error during shutdown cleanup:', err);
+      process.exit(1);
+    }
+  });
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
